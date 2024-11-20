@@ -67,7 +67,7 @@ func openDB(dsn string) (*sql.DB, error) {
 	err = db.Ping()
 	if err != nil {
 		db.Close()
-		return nil, nil
+		return nil, err
 	}
 	return db, nil
 }

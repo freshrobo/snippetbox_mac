@@ -68,17 +68,23 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 
 	var form snippetCreateForm
 
-	err := r.ParseForm()
+	// err := r.ParseForm()
+	// if err != nil {
+	// 	app.clientError(w, http.StatusBadRequest)
+	// 	return
+	// }
+
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	err = app.formDecoder.Decode(&form, r.PostForm)
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
+	// err = app.formDecoder.Decode(&form, r.PostForm)
+	// if err != nil {
+	// 	app.clientError(w, http.StatusBadRequest)
+	// 	return
+	// }
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 charactors long")
