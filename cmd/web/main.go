@@ -100,7 +100,3 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 	return db, nil
 }
-
-func (app *application) isAuthenticated(r *http.Request) bool {
-	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
-}
