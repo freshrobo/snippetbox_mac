@@ -29,8 +29,8 @@ type application struct {
 }
 
 func main() {
-	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
+	addr := flag.String("addr", ":8080", "HTTP network address")
+	dsn := flag.String("dsn", "web:pass@/snippetbox_0115?parseTime=true", "MySQL data source name")
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	flag.Parse()
 
@@ -85,7 +85,8 @@ func main() {
 	logger.Info("starting server", "addr", srv.Addr)
 
 	// err = http.ListenAndServe(*addr, app.routes())
-	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	//err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	err = srv.ListenAndServeTLS("./tls/localhost+2.pem", "./tls/localhost+2-key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }

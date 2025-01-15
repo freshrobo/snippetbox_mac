@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -53,6 +54,30 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 
 	app.render(w, r, http.StatusOK, "view.tmpl", data)
 
+}
+
+func (app *application) snippetDeletePost(w http.ResponseWriter, r *http.Request) {
+
+	id := r.FormValue("ID")
+
+	log.Println("form.id====" + id)
+
+	num, err := strconv.Atoi(id)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	err = app.snippets.Delete(num)
+	if err != nil {
+		log.Println("Error:", err)
+		app.serverError(w, r, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully deleted!")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {

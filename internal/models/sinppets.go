@@ -10,6 +10,7 @@ type SnippetModelInterface interface {
 	Insert(title string, content string, expires int) (int, error)
 	Get(id int) (Snippet, error)
 	Latest() ([]Snippet, error)
+	Delete(id int) error
 }
 
 type Snippet struct {
@@ -59,9 +60,18 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 	return s, nil
 }
 
+func (m *SnippetModel) Delete(id int) error {
+	stmt := `DELETE FROM snippets WHERE id = ?`
+	_, err := m.DB.Exec(stmt, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *SnippetModel) Latest() ([]Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
-	WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10`
+	WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 20`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
