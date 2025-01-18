@@ -86,7 +86,7 @@ func main() {
 
 	// err = http.ListenAndServe(*addr, app.routes())
 	//err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
-	err = srv.ListenAndServeTLS("./tls/localhost+2.pem", "./tls/localhost+2-key.pem")
+	err = srv.ListenAndServeTLS("tls/localhost+2.pem", "./tls/localhost+2-key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }

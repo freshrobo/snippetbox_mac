@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
 
 	"github.com/justinas/alice"
@@ -36,6 +40,78 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /account/password/update", protected.ThenFunc(app.accountPasswordUpdatePost))
 
 	mux.Handle("POST /snippet/delete/{id}", protected.ThenFunc(app.snippetDeletePost))
+
+	mux.HandleFunc("POST /testing/bocheng", func(w http.ResponseWriter, r *http.Request) {
+		var Input struct {
+			Account  string `json:"user_number" binding:"required,email"`
+			Password string `json:"secret" binding:"required"`
+			Name     string `json:"user_name" binding:"required"`
+			Age      int    `json:"age" binding:"required,min=18"`
+		}
+		var Output struct {
+			Message string `json:"message"`
+		}
+		inputJsonBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			Output.Message = "Bad Request Bocheng"
+			w.WriteHeader(http.StatusBadRequest)
+			jsonString, err := json.Marshal(Output)
+			if err != nil {
+				log.Fatal(err)
+			}
+			_, err = fmt.Fprint(w, string(jsonString))
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		log.Println("inputJsonString===============>")
+		log.Println(string(inputJsonBytes))
+		err = json.Unmarshal(inputJsonBytes, &Input)
+		if err != nil {
+			Output.Message = err.Error()
+			w.WriteHeader(http.StatusBadRequest)
+			jsonString, err := json.Marshal(Output)
+			if err != nil {
+				log.Fatal(err)
+			}
+			_, err = fmt.Fprint(w, string(jsonString))
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		fmt.Printf("%+v\n", Input)
+		Output.Message = "OK"
+		responseJsonBytes, _ := json.Marshal(Output)
+		fmt.Fprint(w, string(responseJsonBytes))
+		return
+	})
+	//====== following code is use GIN =====//
+	// gr := gin.Default()
+	// gr.POST("/testing/bocheng", func(c *gin.Context) {
+	// 	var Input struct {
+	// 		Account  string `json:"user_number" binding:"required,email"`
+	// 		Password string `json:"secret" binding:"required"`
+	// 		Name     string `json:"user_name" binding:"required"`
+	// 		Age      int    `json:"age" binding:"required,min=18"`
+	// 	}
+	// 	var Output struct {
+	// 		Message string `json:"message"`
+	// 	}
+	// 	if err := c.ShouldBindJSON(&Input); err != nil {
+	// 		c.JSON(http.StatusBadRequest, gin.H{
+	// 			"Message": err.Error(),
+	// 		})
+	// 		return
+	// 	}
+
+	// 	Output.Message = "OK"
+	// 	c.JSON(http.StatusOK, Output)
+	// 	return
+	// })
+	// mux.Handle("/testing/bocheng", gr)
+	//===== GIN ======//
 
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return standard.Then(mux)
