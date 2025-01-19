@@ -1,0 +1,27 @@
+{{define "title"}}Snippet #{{.Snippet.ID}}{{end}}
+
+{{define "main"}}
+    {{with .Snippet}}
+        <div class='snippet'>
+            <div class='metadata'>
+                <strong>{{.Title}}</strong>
+                <span>#{{.ID}}</span>
+            </div>
+            <pre><code>{{.Content}}</code></pre>
+            <div class='metadata'>
+                <time>Created: {{humanDate .Created}}</time>
+                <time>Expires: {{humanDate .Expires}}</time>
+            </div>
+        </div>
+    {{end}}
+    {{if .IsAuthenticated}}
+    <form action='/snippet/delete/{{.Snippet.ID}}' method='POST'>
+        <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+        <div>
+            <input type='submit' id='delete' name='ID' value={{.Snippet.ID}}> 
+            <strong>If you want to delete this snippet. Press this red button.</strong> 
+        </div>
+    </form>
+            
+    {{end}}
+{{end}}
